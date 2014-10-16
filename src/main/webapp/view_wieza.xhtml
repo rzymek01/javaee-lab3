@@ -5,24 +5,20 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets">
     <f:metadata>
-        <f:viewParam name="bookId" value="#{viewBook.bookId}" required="true" id="bookId" />
-        <f:event type="preRenderView" listener="#{viewBook.init()}"/>
+        <f:viewParam name="wiezaId" value="#{viewWieza.wiezaId}" required="true" id="wiezaId" />
+        <f:event type="preRenderView" listener="#{viewWieza.init()}"/>
     </f:metadata>
     <body>
         <ui:composition template="/WEB-INF/templates/main.xhtml">
             <ui:define name="head">
-                <title>#{viewBook.book.title}</title>
+                <title>Wieża [id: #{viewWieza.wieza.id}]</title>
             </ui:define>
             <ui:define name="content">
                 <h:panelGrid columns="2">
-                    <h:outputLabel value="#{msg.title}:" for="title"/>
-                    <h:outputText id="title" value="#{viewBook.book.title}"/>
-                    <h:outputLabel value="#{msg.publishDate}:" for="date"/>
-                    <h:outputText id="date" value="#{viewBook.book.publishDate}">
-                        <f:convertDateTime pattern="yyyy-MM-dd"/>
-                    </h:outputText>
+                    <h:outputLabel value="#{msg.height}:" for="wysokosc"/>
+                    <h:outputText id="wysokosc" value="#{viewWieza.wieza.wysokosc}"/>
                 </h:panelGrid>
-                <h:button value="#{msg.back}" outcome="list_books.xhtml"/>
+                <h:button value="#{msg.back}" outcome="list_wieze.xhtml"/>
             </ui:define>
         </ui:composition>
     </body>
