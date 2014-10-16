@@ -14,10 +14,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -43,9 +40,12 @@ public class WiezaService implements Serializable {
       for (Wieza wieza : swiat.getWieza()) {
         wieze.put(wieza.getId(), wieza);
         for (Mag mag : wieza.getMag()) {
+          // setting tower to which belongs mag
+          mag.setWieza(wieza, false);
           magowie.put(mag.getId(), mag);
         }
       }
+
     } catch (JAXBException ex) {
       log.log(Level.WARNING, ex.getMessage(), ex);
     }
@@ -73,7 +73,11 @@ public class WiezaService implements Serializable {
 
   public void saveWieza(Wieza wieza) {
     if (wieza.getId() == 0) {
-      wieza.setId(wieze.lastKey() + 1);
+      try {
+        wieza.setId(wieze.lastKey() + 1);
+      } catch (NoSuchElementException e) {
+        wieza.setId(1);
+      }
     }
     wieze.put(wieza.getId(), wieza);
   }
@@ -84,6 +88,22 @@ public class WiezaService implements Serializable {
 
   public Mag findMag(int id) {
     return magowie.get(id);
+  }
+
+  public void removeMag(Mag mag) {
+    mag.setWieza(null);
+    magowie.remove(mag.getId());
+  }
+
+  public void saveMag(Mag mag) {
+    if (mag.getId() == 0) {
+      try {
+        mag.setId(magowie.lastKey() + 1);
+      } catch (NoSuchElementException e) {
+        mag.setId(1);
+      }
+    }
+    magowie.put(mag.getId(), mag);
   }
 
   public void marshalSwiat(OutputStream out) {

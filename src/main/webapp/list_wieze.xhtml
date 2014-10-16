@@ -32,6 +32,21 @@
           <h:column>
             <h:outputText value="#{mag.zywiol}"/>
           </h:column>
+          <h:column>
+            <h:button value="#{msg.view}" outcome="view_mag.xhtml">
+              <f:param name="magId" value="#{mag.id}"/>
+            </h:button>
+          </h:column>
+          <h:column>
+            <h:button value="#{msg.edit}" outcome="edit_mag.xhtml">
+              <f:param name="magId" value="#{mag.id}"/>
+            </h:button>
+          </h:column>
+          <h:column>
+            <h:form>
+              <h:commandButton value="#{msg.remove}" action="#{listWieze.removeMag(mag)}"/>
+            </h:form>
+          </h:column>
         </h:dataTable>
       </h:column>
       <h:column>
@@ -53,7 +68,8 @@
     <h:form>
       <h:commandButton value="#{msg.download}" action="#{listWieze.downloadSwiatXML()}"/>
     </h:form>
-    <h:button value="#{msg.new}" outcome="edit_wieza.xhtml"/>
+    <h:button value="#{msg.newTower}" outcome="edit_wieza.xhtml"/>
+    <h:button value="#{msg.newMag}" outcome="edit_mag.xhtml"/>
   </ui:define>
 </ui:composition>
 </body>

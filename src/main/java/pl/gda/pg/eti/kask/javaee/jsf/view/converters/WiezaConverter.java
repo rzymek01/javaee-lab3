@@ -2,6 +2,7 @@ package pl.gda.pg.eti.kask.javaee.jsf.view.converters;
 
 import pl.gda.pg.eti.kask.javaee.jsf.WiezaService;
 import pl.gda.pg.eti.kask.javaee.jsf.entities.Mag;
+import pl.gda.pg.eti.kask.javaee.jsf.entities.Wieza;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -17,7 +18,7 @@ import javax.faces.convert.Converter;
  */
 @ManagedBean
 @RequestScoped
-public class MagConverter implements Converter {
+public class WiezaConverter implements Converter {
 
     @ManagedProperty("#{wiezaService}")
     private WiezaService wiezaService;
@@ -31,7 +32,7 @@ public class MagConverter implements Converter {
         if ("---".equals(value)) {
             return null;
         }
-        return wiezaService.findMag(Integer.parseInt(value));
+        return wiezaService.findWieza(Integer.parseInt(value));
     }
 
     @Override
@@ -39,6 +40,6 @@ public class MagConverter implements Converter {
         if (value == null) {
             return "---";
         }
-        return ((Mag) value).getId() + "";
+        return ((Wieza) value).getId() + "";
     }
 }

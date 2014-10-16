@@ -20,11 +20,11 @@
                         <h:inputText id="wysokosc" value="#{editWieza.wieza.wysokosc}" required="true"/>
                         <h:message for="wysokosc"/>
 
-                        <h:outputLabel value="#{msg.authors}:" for="mag"/>
-                        <h:selectManyListbox id="mag" value="#{editWieza.wieza.mag}" converter="#{magConverter}">
-                            <f:selectItems value="#{editWieza.magowieAsSelectItems}"/>
-                        </h:selectManyListbox>
-                        <h:message for="mag"/>
+                        <!--<h:outputLabel value="#-{msg.authors}:" for="mag"/>-->
+                        <!--<h:selectManyListbox id="mag" value="#-{editWieza.wieza.mag}" converter="#-{magConverter}">-->
+                            <!--<f:selectItems value="#-{editWieza.magowieAsSelectItems}"/>-->
+                        <!--</h:selectManyListbox>-->
+                        <!--<h:message for="mag"/>-->
 
                         <!--<h:outputLabel value="#-{msg.element}:" for="zywiol"/>-->
                         <!--<h:selectOneMenu id="zywiol" value="#-{editWieza.wieza.zywiol}">-->
