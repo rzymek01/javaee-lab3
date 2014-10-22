@@ -1,13 +1,11 @@
 
 package pl.gda.pg.eti.kask.javaee.jsf.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -42,13 +40,25 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "wieza", namespace = "http://www.eti.pg.gda.pl/kask/javaee/wieze", propOrder = {
     "mag"
 })
+@Getter
+@Setter
+@Entity
+@Table(name = "wieze")
+@NamedQuery(name = "Wieza.findAll", query = "SELECT w FROM Wieza w")
 public class Wieza {
 
   @XmlElement(namespace = "http://www.eti.pg.gda.pl/kask/javaee/wieze")
+  @OneToMany(mappedBy = "wieza", cascade = CascadeType.ALL)
   protected List<Mag> mag;
+
   @XmlAttribute(name = "wysokosc", required = true)
+  @Column
   protected int wysokosc;
+
   @XmlAttribute(name = "id", required = true)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column
   protected int id;
 
   /**
@@ -71,43 +81,6 @@ public class Wieza {
    * Objects of the following type(s) are allowed in the list
    * {@link Mag }
    */
-  public List<Mag> getMag() {
-    if (mag == null) {
-      mag = new ArrayList<Mag>();
-    }
-    return this.mag;
-  }
 
-  public void setMag(List<Mag> mag) {
-    this.mag = mag;
-  }
-
-  /**
-   * Gets the value of the wysokosc property.
-   */
-  public int getWysokosc() {
-    return wysokosc;
-  }
-
-  /**
-   * Sets the value of the wysokosc property.
-   */
-  public void setWysokosc(int value) {
-    this.wysokosc = value;
-  }
-
-  /**
-   * Gets the value of the id property.
-   */
-  public int getId() {
-    return id;
-  }
-
-  /**
-   * Sets the value of the id property.
-   */
-  public void setId(int value) {
-    this.id = value;
-  }
 
 }

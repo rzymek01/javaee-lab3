@@ -6,8 +6,12 @@ import pl.gda.pg.eti.kask.javaee.jsf.entities.ObjectFactory;
 import pl.gda.pg.eti.kask.javaee.jsf.entities.Swiat;
 import pl.gda.pg.eti.kask.javaee.jsf.entities.Wieza;
 
-import javax.faces.bean.ApplicationScoped;
+import javax.annotation.Resource;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -22,88 +26,138 @@ import java.util.logging.Level;
  * @author maciek
  */
 @ManagedBean
-@ApplicationScoped
+@ViewScoped
 @Log
 public class WiezaService implements Serializable {
 
-  private SortedMap<Integer, Wieza> wieze;
+  @PersistenceContext
+  EntityManager em;
 
-  private SortedMap<Integer, Mag> magowie;
+  @Resource
+  UserTransaction userTransaction;
 
-  public WiezaService() {
-    wieze = new TreeMap<>();
-    magowie = new TreeMap<>();
-    try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
-      Unmarshaller u = jaxbContext.createUnmarshaller();
-      Swiat swiat = (Swiat) u.unmarshal(getClass().getResourceAsStream("/pl/gda/pg/eti/kask/javaee/jsf/xml/wieze.xml"));
-      for (Wieza wieza : swiat.getWieza()) {
-        wieze.put(wieza.getId(), wieza);
-        for (Mag mag : wieza.getMag()) {
-          // setting tower to which belongs mag
-          mag.setWieza(wieza, false);
-          magowie.put(mag.getId(), mag);
-        }
-      }
+//  private SortedMap<Integer, Wieza> wieze;
+//
+//  private SortedMap<Integer, Mag> magowie;
 
-    } catch (JAXBException ex) {
-      log.log(Level.WARNING, ex.getMessage(), ex);
-    }
-  }
+//  public WiezaService() {
+//    wieze = new TreeMap<>();
+//    magowie = new TreeMap<>();
+//    try {
+//      JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
+//      Unmarshaller u = jaxbContext.createUnmarshaller();
+//      Swiat swiat = (Swiat) u.unmarshal(getClass().getResourceAsStream("/pl/gda/pg/eti/kask/javaee/jsf/xml/wieze.xml"));
+//      for (Wieza wieza : swiat.getWieza()) {
+//        wieze.put(wieza.getId(), wieza);
+//        for (Mag mag : wieza.getMag()) {
+//          // setting tower to which belongs mag
+//          mag.setWieza(wieza, false);
+//          magowie.put(mag.getId(), mag);
+//        }
+//      }
+//
+//    } catch (JAXBException ex) {
+//      log.log(Level.WARNING, ex.getMessage(), ex);
+//    }
+//  }
 
   private List<Mag> asList(Mag... magowie) {
-    List<Mag> list = new ArrayList<>();
-    for (Mag mag : magowie) {
-      list.add(mag);
-    }
-    return list;
+    return findAllMagowie();
   }
 
   public List<Wieza> findAllWieze() {
-    return new ArrayList<>(wieze.values());
+    return em.createNamedQuery("Wieza.findAll").getResultList();
   }
 
   public Wieza findWieza(int id) {
-    return wieze.get(id);
+    return em.find(Wieza.class, id);
   }
 
   public void removeWieza(Wieza wieza) {
-    wieze.remove(wieza.getId());
+    try {
+      userTransaction.begin();
+
+      wieza = em.merge(wieza);
+      em.remove(wieza);
+
+      userTransaction.commit();
+    } catch (Exception e) {
+      e.printStackTrace();
+
+      try {
+        userTransaction.rollback();
+      } catch (SystemException e1) {
+        e1.printStackTrace();
+      }
+    }
+
   }
 
   public void saveWieza(Wieza wieza) {
-    if (wieza.getId() == 0) {
+    try {
+      userTransaction.begin();
+      if (wieza.getId() > 0) {
+        em.merge(wieza);
+      } else {
+        em.persist(wieza);
+      }
+      userTransaction.commit();
+    } catch (Exception e) {
+      e.printStackTrace();
+
       try {
-        wieza.setId(wieze.lastKey() + 1);
-      } catch (NoSuchElementException e) {
-        wieza.setId(1);
+        userTransaction.rollback();
+      } catch (SystemException e1) {
+        e1.printStackTrace();
       }
     }
-    wieze.put(wieza.getId(), wieza);
   }
 
   public List<Mag> findAllMagowie() {
-    return new ArrayList<>(magowie.values());
+    return em.createNamedQuery("Mag.findAll").getResultList();
   }
 
   public Mag findMag(int id) {
-    return magowie.get(id);
+    return em.find(Mag.class, id);
   }
 
   public void removeMag(Mag mag) {
-    mag.setWieza(null);
-    magowie.remove(mag.getId());
+    try {
+      userTransaction.begin();
+
+      mag = em.merge(mag);
+      em.remove(mag);
+
+      userTransaction.commit();
+    } catch (Exception e) {
+      e.printStackTrace();
+
+      try {
+        userTransaction.rollback();
+      } catch (SystemException e1) {
+        e1.printStackTrace();
+      }
+    }
   }
 
   public void saveMag(Mag mag) {
-    if (mag.getId() == 0) {
+    try {
+      userTransaction.begin();
+      if (mag.getId() > 0) {
+        em.merge(mag);
+      } else {
+        em.persist(mag);
+      }
+      userTransaction.commit();
+    } catch (Exception e) {
+      e.printStackTrace();
+
       try {
-        mag.setId(magowie.lastKey() + 1);
-      } catch (NoSuchElementException e) {
-        mag.setId(1);
+        userTransaction.rollback();
+      } catch (SystemException e1) {
+        e1.printStackTrace();
       }
     }
-    magowie.put(mag.getId(), mag);
   }
 
   public void marshalSwiat(OutputStream out) {
@@ -111,7 +165,7 @@ public class WiezaService implements Serializable {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
       Marshaller m = jaxbContext.createMarshaller();
       Swiat swiat = new Swiat();
-      swiat.getWieza().addAll(wieze.values());
+      swiat.getWieza().addAll(findAllWieze());
       m.marshal(swiat, out);
     } catch (JAXBException ex) {
       log.log(Level.WARNING, ex.getMessage(), ex);
